@@ -1,5 +1,18 @@
 'use client';
 
+export default function Layout({ children }: { children: React.ReactNode }) {
+  return (
+    <section className="flex flex-col min-h-screen">
+      {children}
+    </section>
+  );
+}
+
+
+
+
+/*'use client';
+
 import Link from 'next/link';
 import { use, useState, Suspense } from 'react';
 import { Button } from '@/components/ui/button';
@@ -95,12 +108,6 @@ function Header() {
     </header>
   );
 }
+*/
 
-export default function Layout({ children }: { children: React.ReactNode }) {
-  return (
-    <section className="flex flex-col min-h-screen">
-      <Header />
-      {children}
-    </section>
-  );
-}
+

@@ -1,4 +1,3 @@
-// components/ui/Header.tsx
 'use client';
 
 import Link from 'next/link';
@@ -28,14 +27,8 @@ export default function Header() {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <Link href="/jobs" className="text-gray-700 hover:text-blue-600 font-medium transition">
+            <Link href="/tjanster" className="text-gray-700 hover:text-blue-600 font-medium transition">
               Beställ jobb
-            </Link>
-            <Link href="/profile" className="text-gray-700 hover:text-blue-600 font-medium transition">
-              Min profil
-            </Link>
-            <Link href="/projects" className="text-gray-700 hover:text-blue-600 font-medium transition">
-              Projekt
             </Link>
           </nav>
 
@@ -62,12 +55,18 @@ export default function Header() {
               </div>
             ) : (
               <>
-                <button className="text-[hsl(var(--primary))] hover:text-[hsl(var(--primary)/0.8)] font-medium transition">
+                <Link
+                  href="/sign-in"
+                  className="text-[hsl(var(--primary))] hover:text-[hsl(var(--primary)/0.8)] font-medium transition"
+                >
                   Logga in
-                </button>
-                <button className="bg-[hsl(var(--accent))] text-white px-4 py-2 rounded-lg font-medium hover:bg-[hsl(var(--accent)/0.9)] transition shadow-sm">
+                </Link>
+                <Link
+                  href="/sign-up"
+                  className="bg-[hsl(var(--accent))] text-white px-4 py-2 rounded-lg font-medium hover:bg-[hsl(var(--accent)/0.9)] transition shadow-sm"
+                >
                   Registrera
-                </button>
+                </Link>
               </>
             )}
           </div>
@@ -86,15 +85,14 @@ export default function Header() {
       {mobileMenuOpen && (
         <div className="md:hidden border-t border-gray-200 bg-white">
           <div className="px-4 pt-2 pb-3 space-y-1">
-            <Link href="/jobs" className="block px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-md font-medium" onClick={() => setMobileMenuOpen(false)}>
+            <Link
+              href="/tjanster"
+              className="block px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-md font-medium"
+              onClick={() => setMobileMenuOpen(false)}
+            >
               Beställ jobb
             </Link>
-            <Link href="/profile" className="block px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-md font-medium" onClick={() => setMobileMenuOpen(false)}>
-              Min profil
-            </Link>
-            <Link href="/projects" className="block px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-md font-medium" onClick={() => setMobileMenuOpen(false)}>
-              Projekt
-            </Link>
+            
 
             {/* Mobile Auth */}
             <div className="pt-4 pb-3 border-t border-gray-200 mt-3">
@@ -125,12 +123,20 @@ export default function Header() {
                 </>
               ) : (
                 <>
-                  <button className="block w-full text-left px-3 py-2 text-[hsl(var(--primary))] hover:bg-[hsl(var(--primary)/0.05)] rounded-md font-medium transition">
+                  <Link
+                    href="/sign-in"
+                    className="block w-full text-left px-3 py-2 text-[hsl(var(--primary))] hover:bg-[hsl(var(--primary)/0.05)] rounded-md font-medium transition"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
                     Logga in
-                  </button>
-                  <button className="block w-full text-left mt-2 px-3 py-2 bg-[hsl(var(--accent))] text-white rounded-md font-medium hover:bg-[hsl(var(--accent)/0.9)] transition">
+                  </Link>
+                  <Link
+                    href="/sign-up"
+                    className="block w-full text-left mt-2 px-3 py-2 bg-[hsl(var(--accent))] text-white rounded-md font-medium hover:bg-[hsl(var(--accent)/0.9)] transition"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
                     Registrera
-                  </button>
+                  </Link>
                 </>
               )}
             </div>
