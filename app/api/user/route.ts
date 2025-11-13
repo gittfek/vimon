@@ -1,6 +1,8 @@
+// app/api/user/route.ts
+import { NextResponse } from 'next/server';
 import { getUser } from '@/lib/db/queries';
 
 export async function GET() {
   const user = await getUser();
-  return Response.json(user);
+  return NextResponse.json(user || null);
 }
