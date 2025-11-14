@@ -104,26 +104,26 @@ export default function GolvlaggningPage() {
   </h2>
   
   <div className="overflow-x-auto py-2 -mx-4 px-4">
-    <div className="flex gap-6 min-w-max">
-      <div className="bg-card border border-border rounded-2xl shadow-sm p-6 min-w-[300px] flex-shrink-0">
+    <div className="flex gap-6">
+      <div className="bg-card border border-border rounded-2xl shadow-sm p-6 flex-shrink-0 w-full sm:w-[300px]">
         <p className="text-muted-foreground mb-4">
           “Vimon gjorde ett fantastiskt jobb med vårt vardagsrumsgolv! Snabbt, smidigt och väldigt noggrant.”
         </p>
         <p className="font-semibold text-foreground">– Anna, Malmö</p>
       </div>
-      <div className="bg-card border border-border rounded-2xl shadow-sm p-6 min-w-[300px] flex-shrink-0">
+      <div className="bg-card border border-border rounded-2xl shadow-sm p-6 flex-shrink-0 w-full sm:w-[300px]">
         <p className="text-muted-foreground mb-4">
           “Vi är supernöjda med golvläggningen. Tydlig kommunikation och snygg finish. Rekommenderas starkt!”
         </p>
         <p className="font-semibold text-foreground">– Johan, Lund</p>
       </div>
-      <div className="bg-card border border-border rounded-2xl shadow-sm p-6 min-w-[300px] flex-shrink-0">
+      <div className="bg-card border border-border rounded-2xl shadow-sm p-6 flex-shrink-0 w-full sm:w-[300px]">
         <p className="text-muted-foreground mb-4">
           “Otroligt proffsigt arbete. Golvet ser ut precis som vi drömt om.”
         </p>
         <p className="font-semibold text-foreground">– Sara, Helsingborg</p>
       </div>
-      <div className="bg-card border border-border rounded-2xl shadow-sm p-6 min-w-[300px] flex-shrink-0">
+      <div className="bg-card border border-border rounded-2xl shadow-sm p-6 flex-shrink-0 w-full sm:w-[300px]">
         <p className="text-muted-foreground mb-4">
           “Rekommenderar Vimon till alla som vill ha ett golv gjort på rätt sätt.”
         </p>
