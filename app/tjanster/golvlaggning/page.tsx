@@ -1,20 +1,120 @@
-// app/tjanster/golvlaggning/page.tsx
+"use client";
+
 import Link from "next/link";
-import { Hammer } from "lucide-react";
+import Image from "next/image";
+import { useRef, useState, useEffect } from "react";
+import { Hammer, Clock, Layers, DollarSign, Info, MessageSquare } from "lucide-react";
+import { motion } from "framer-motion";
+
+const testimonials = [
+  {
+    text: "Vimon gjorde ett fantastiskt jobb med vårt vardagsrumsgolv! Snabbt, smidigt och väldigt noggrant.",
+    author: "– Anna, Malmö",
+  },
+  {
+    text: "Vi är supernöjda med golvläggningen. Tydlig kommunikation och snygg finish. Rekommenderas starkt!",
+    author: "– Johan, Lund",
+  },
+  {
+    text: "Otroligt proffsigt arbete. Golvet ser ut precis som vi drömt om.",
+    author: "– Sara, Helsingborg",
+  },
+  {
+    text: "Rekommenderar Vimon till alla som vill ha ett golv gjort på rätt sätt.",
+    author: "– Erik, Malmö",
+  },
+];
 
 export default function GolvlaggningPage() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  // Uppdatera aktivt index vid scroll
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const onScroll = () => {
+      const scrollLeft = container.scrollLeft;
+      const cardWidth = container.scrollWidth / testimonials.length;
+      const index = Math.round(scrollLeft / cardWidth);
+      setActiveIndex(index);
+    };
+
+    container.addEventListener("scroll", onScroll, { passive: true });
+    return () => container.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const scrollToIndex = (i: number) => {
+    const container = containerRef.current;
+    if (!container) return;
+    const cardWidth = container.scrollWidth / testimonials.length;
+    container.scrollTo({ left: i * cardWidth, behavior: "smooth" });
+  };
+
   return (
-    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-      {/* Hero */}
-      <section className="text-center mb-16">
-        <div className="w-16 h-16 rounded-xl bg-[hsl(var(--primary)/0.1)] flex items-center justify-center mx-auto mb-4">
-          <Hammer className="w-8 h-8 text-[hsl(var(--primary))]" />
+    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-16">
+      {/* Hero med subtil bakgrundsanimation */}
+      <section className="relative text-center mb-8 overflow-hidden">
+        <motion.div
+          className="absolute top-[-20%] left-[-20%] w-[200%] h-[200%] bg-gradient-to-r from-[hsl(var(--primary)/0.2)] to-[hsl(var(--accent)/0.2)] blur-3xl animate-slow-spin"
+          initial={{ opacity: 0.3 }}
+          animate={{ opacity: 0.5 }}
+          transition={{ repeat: Infinity, duration: 20, yoyo: true }}
+        />
+        <div className="relative z-10">
+          <div className="w-16 h-16 rounded-xl bg-[hsl(var(--primary)/0.1)] flex items-center justify-center mx-auto mb-4">
+            <Hammer className="w-8 h-8 text-[hsl(var(--primary))]" />
+          </div>
+          <h1 className="text-4xl font-bold text-foreground mb-4">Golvläggning</h1>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Vi lägger parkett, laminat och vinyl med noggrannhet och finish i världsklass.
+            Oavsett storlek på rummet levererar vi ett golv som både känns och ser perfekt ut.
+          </p>
         </div>
-        <h1 className="text-4xl font-bold text-foreground mb-4">Golvläggning</h1>
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-          Vi lägger parkett, laminat och vinyl med noggrannhet och finish i världsklass. 
-          Oavsett storlek på rummet levererar vi ett golv som både känns och ser perfekt ut.
-        </p>
+      </section>
+
+      {/* Snabbfakta */}
+      <section className="mb-16 flex flex-col sm:flex-row justify-center items-center gap-6 text-muted-foreground">
+        <div className="flex items-center gap-2">
+          <Clock className="w-5 h-5 text-[hsl(var(--primary))]" />
+          <span>Tid: 1–3 dagar</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <Layers className="w-5 h-5 text-[hsl(var(--primary))]" />
+          <span>Typ av golv: Parkett, Laminat, Vinyl</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <DollarSign className="w-5 h-5 text-[hsl(var(--primary))]" />
+          <span>Pris: Fast pris</span>
+        </div>
+      </section>
+
+      {/* Före / efter */}
+      <section className="mb-16">
+        <h2 className="text-2xl font-semibold text-foreground mb-6 text-center">Före & efter</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="rounded-2xl overflow-hidden shadow-sm">
+            <Image
+              src="/images/golv-fore.jpg"
+              alt="Golvet före läggning"
+              width={600}
+              height={400}
+              className="w-full h-auto object-cover"
+            />
+            <p className="text-center text-muted-foreground mt-2">Före – slitet och ojämnt golv</p>
+          </div>
+          <div className="rounded-2xl overflow-hidden shadow-sm">
+            <Image
+              src="/images/golv-efter.jpg"
+              alt="Golvet efter läggning"
+              width={600}
+              height={400}
+              className="w-full h-auto object-cover"
+            />
+            <p className="text-center text-muted-foreground mt-2">Efter – nytt, jämnt och elegant golv</p>
+          </div>
+        </div>
       </section>
 
       {/* Om tjänsten */}
@@ -30,13 +130,78 @@ export default function GolvlaggningPage() {
       </section>
 
       {/* Varför välja oss */}
-      <section className="mb-16 bg-[hsl(var(--primary)/0.05)] p-8 rounded-2xl">
-        <h2 className="text-2xl font-semibold text-foreground mb-4">Varför välja Vimon?</h2>
-        <div className="space-y-4 text-muted-foreground">
+      <section className="mb-16 bg-[hsl(var(--primary)/0.05)] p-8 rounded-2xl relative overflow-hidden">
+        <motion.div
+          className="absolute top-[-10%] left-[-10%] w-[220%] h-[220%] bg-gradient-to-r from-[hsl(var(--accent)/0.1)] to-[hsl(var(--primary)/0.1)] blur-3xl animate-slow-spin"
+          initial={{ opacity: 0.2 }}
+          animate={{ opacity: 0.4 }}
+          transition={{ repeat: Infinity, duration: 25, yoyo: true }}
+        />
+        <div className="relative z-10 space-y-4 text-muted-foreground">
+          <h2 className="text-2xl font-semibold text-foreground mb-4">Varför välja Vimon?</h2>
           <p>✅ Tryggt och pålitligt – vi håller tider och priser.</p>
           <p>✅ Erfarenhet – tusentals kvadratmeter golv lagda sedan starten.</p>
           <p>✅ Snabbt och smidigt – vi tar hand om hela processen från start till slut.</p>
           <p>✅ Personlig service – vi hjälper dig välja rätt golv för just ditt hem.</p>
+        </div>
+      </section>
+
+      {/* Tips & skötsel */}
+      <section className="mb-16 bg-[hsl(var(--primary)/0.05)] p-8 rounded-2xl relative overflow-hidden">
+        <motion.div
+          className="absolute top-[-10%] left-[-10%] w-[220%] h-[220%] bg-gradient-to-r from-[hsl(var(--accent)/0.1)] to-[hsl(var(--primary)/0.1)] blur-3xl animate-slow-spin"
+          initial={{ opacity: 0.2 }}
+          animate={{ opacity: 0.4 }}
+          transition={{ repeat: Infinity, duration: 30, yoyo: true }}
+        />
+        <div className="relative z-10">
+          <h2 className="text-2xl font-semibold text-foreground mb-4 flex items-center justify-center gap-2">
+            <Info className="w-5 h-5 text-[hsl(var(--primary))]" /> Tips & skötsel
+          </h2>
+          <ul className="list-disc list-inside text-muted-foreground space-y-2">
+            <li>Torka upp spill omedelbart för att undvika fläckar eller skador.</li>
+            <li>Använd filtkuddar under möbler för att skydda ytan.</li>
+            <li>Dammsug eller sopa regelbundet för att hålla golvet rent och fint.</li>
+            <li>Använd rekommenderade rengöringsmedel för just ditt golvtyp.</li>
+          </ul>
+        </div>
+      </section>
+
+      {/* Kundcitat-karusell */}
+      <section className="mb-16">
+        <h2 className="text-2xl font-semibold text-foreground mb-6 text-center flex justify-center items-center gap-2">
+          <MessageSquare className="w-5 h-5 text-[hsl(var(--primary))]" /> Kundcitat
+        </h2>
+
+        <div ref={containerRef} className="overflow-x-auto py-2 -mx-4 px-4 scroll-smooth">
+          <div className="flex gap-6 min-w-max">
+            {testimonials.map((t, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.5 }}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
+                className="bg-card border border-border rounded-2xl shadow-sm p-6 min-w-[300px] flex-shrink-0"
+              >
+                <p className="text-muted-foreground mb-4">{t.text}</p>
+                <p className="font-semibold text-foreground">{t.author}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+
+        {/* Dots */}
+        <div className="flex justify-center mt-4 gap-2">
+          {testimonials.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => scrollToIndex(i)}
+              className={`w-3 h-3 rounded-full transition-colors ${
+                i === activeIndex ? "bg-[hsl(var(--primary))]" : "bg-muted-foreground/50"
+              }`}
+            />
+          ))}
         </div>
       </section>
 
