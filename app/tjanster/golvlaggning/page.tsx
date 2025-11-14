@@ -131,21 +131,6 @@ export default function GolvlaggningPage() {
       </div>
     </div>
   </div>
-
-      {/* Dots */}
-      <div className="flex justify-center mt-4 gap-2">
-        {testimonials.map((_, i) => (
-          <button
-            key={i}
-            onClick={() => scrollToIndex(i)}
-            className={`w-3 h-3 rounded-full transition-colors ${
-              i === activeIndex
-                ? "bg-[hsl(var(--primary))]"
-                : "bg-muted-foreground/50"
-            }`}
-          />
-        ))}
-      </div>
 </section>
 
       {/* CTA */}
