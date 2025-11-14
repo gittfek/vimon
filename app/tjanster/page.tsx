@@ -60,31 +60,31 @@ export default function ServicesPage() {
         </p>
       </section>
 
-      {/* Service grid */}
-      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
-        {services.map((service, i) => (
-          <div
-            key={i}
-            className="bg-card border border-border rounded-2xl shadow-sm hover:shadow-md hover:border-border/50 transition-all p-6 flex flex-col justify-between"
-          >
-            <div>
-              <div className="w-12 h-12 rounded-xl bg-[hsl(var(--primary)/0.1)] flex items-center justify-center mb-4">
-                {service.icon}
-              </div>
-              <h3 className="text-xl font-semibold mb-2 text-foreground">
-                {service.title}
-              </h3>
-              <p className="text-muted-foreground mb-4">{service.desc}</p>
-            </div>
-            <Link
-              href={`/tjanster/${service.slug}`}
-              className="mt-auto inline-block text-[hsl(var(--primary))] font-medium hover:underline"
-            >
-              Beställ jobb
-            </Link>
+{/* Tjänsteexempel */}
+<section className="py-16 bg-card">
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <h2 className="text-3xl font-bold text-foreground text-center mb-12">Våra mest populära tjänster</h2>
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+      {services.map((service, i) => (
+        <Link
+          key={i}
+          href={service.slug}
+          className="group bg-background border border-border rounded-2xl p-6 flex flex-col items-center hover:shadow-md transition"
+        >
+          <div className="w-12 h-12 rounded-xl bg-[hsl(var(--primary)/0.1)] flex items-center justify-center mb-4 group-hover:bg-[hsl(var(--primary)/0.15)] transition">
+            {service.icon}
           </div>
-        ))}
-      </section>
+          <h3 className="text-xl font-semibold mb-2 text-center group-hover:text-[hsl(var(--primary))] transition">
+            {service.title}
+          </h3>
+          <p className="text-muted-foreground text-center">
+            Läs mer och beställ direkt
+          </p>
+        </Link>
+      ))}
+    </div>
+  </div>
+</section>
 
       {/* CTA */}
       <section className="text-center bg-[hsl(var(--primary)/0.05)] py-12 rounded-2xl">
