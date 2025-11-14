@@ -2,18 +2,28 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { Menu, X, LogOut, Moon, Sun } from 'lucide-react';
+import { Menu, X, LogOut, Moon, Sun, Settings, Activity, Shield, Users } from 'lucide-react';
 import useSWR from 'swr';
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
+// Dashboard-länkar som tidigare låg i sidobaren
+const navItems = [
+  { href: '/dashboard', icon: Users, label: 'Team' },
+  { href: '/dashboard/general', icon: Settings, label: 'General' },
+  { href: '/dashboard/activity', icon: Activity, label: 'Activity' },
+  { href: '/dashboard/security', icon: Shield, label: 'Security' }
+];
+
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [settingsOpenMobile, setSettingsOpenMobile] = useState(false);
   const [isDark, setIsDark] = useState(false);
   const { data: user, error } = useSWR('/api/user', fetcher);
   const isLoggedIn = !!user && !error;
 
-  // Automatisk dark mode + localStorage
+  // Dark mode + localStorage
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -38,6 +48,7 @@ export default function Header() {
         }
       }
     };
+
     mediaQuery.addEventListener('change', handleChange);
     return () => mediaQuery.removeEventListener('change', handleChange);
   }, []);
@@ -77,24 +88,48 @@ export default function Header() {
             </Link>
           </nav>
 
-          {/* Desktop Auth + Dark Mode Toggle */}
+          {/* Desktop right section */}
           <div className="hidden md:flex items-center space-x-3">
+
+            {/* Dark mode button */}
             <button
               onClick={toggleTheme}
               className="p-2 rounded-lg text-[hsl(var(--foreground))] hover:bg-[hsl(var(--muted))] transition"
-              aria-label="Byt till mörkt/ljust läge"
             >
               {isDark ? <Sun size={20} /> : <Moon size={20} />}
             </button>
 
+            {/* Settings dropdown (desktop) - only if logged in */}
+            {isLoggedIn && (
+              <div className="relative">
+                <button
+                  onClick={() => setSettingsOpen(prev => !prev)}
+                  className="p-2 rounded-lg text-[hsl(var(--foreground))] hover:bg-[hsl(var(--muted))] transition"
+                >
+                  <Settings size={20} />
+                </button>
+
+                {settingsOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-[hsl(var(--card))] border border-[hsl(var(--border))] rounded-lg shadow-lg py-2 z-50">
+                    {navItems.map(item => (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        onClick={() => setSettingsOpen(false)}
+                        className="flex items-center space-x-2 px-3 py-2 hover:bg-[hsl(var(--muted))] transition text-[hsl(var(--foreground))]"
+                      >
+                        <item.icon size={16} />
+                        <span>{item.label}</span>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Auth */}
             {isLoggedIn ? (
               <div className="flex items-center space-x-4">
-                <Link
-                  href="/dashboard"
-                  className="text-[hsl(var(--primary))] hover:text-[hsl(var(--primary)/0.8)] font-medium transition"
-                >
-                  Mina jobb
-                </Link>
                 <div className="flex items-center space-x-2">
                   <div className="w-8 h-8 bg-[hsl(var(--accent))] rounded-full flex items-center justify-center text-white text-sm font-bold">
                     {user.email[0].toUpperCase()}
@@ -108,10 +143,7 @@ export default function Header() {
               </div>
             ) : (
               <>
-                <Link
-                  href="/sign-in"
-                  className="text-[hsl(var(--primary))] hover:text-[hsl(var(--primary)/0.8)] font-medium transition"
-                >
+                <Link href="/sign-in" className="text-[hsl(var(--primary))] hover:text-[hsl(var(--primary)/0.8)] font-medium transition">
                   Logga in
                 </Link>
                 <Link
@@ -124,13 +156,30 @@ export default function Header() {
             )}
           </div>
 
+          {/* Mobile settings button */}
+          {isLoggedIn && (
+            <button
+              onClick={() => {
+                setSettingsOpenMobile(prev => !prev);
+                setMobileMenuOpen(false);
+              }}
+              className="md:hidden p-2 rounded-md text-[hsl(var(--foreground))] hover:bg-[hsl(var(--muted))]"
+            >
+              <Settings size={22} />
+            </button>
+          )}
+
           {/* Mobile menu button */}
           <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            onClick={() => {
+              setMobileMenuOpen(prev => !prev);
+              setSettingsOpenMobile(false);
+            }}
             className="md:hidden p-2 rounded-md text-[hsl(var(--foreground))] hover:bg-[hsl(var(--muted))]"
           >
             {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
+
         </div>
       </div>
 
@@ -140,8 +189,8 @@ export default function Header() {
           <div className="px-4 pt-2 pb-3 space-y-1">
             <Link
               href="/tjanster"
-              className="block px-3 py-2 text-[hsl(var(--foreground))] hover:bg-[hsl(var(--muted))] rounded-md font-medium"
               onClick={() => setMobileMenuOpen(false)}
+              className="block px-3 py-2 text-[hsl(var(--foreground))] hover:bg-[hsl(var(--muted))] rounded-md font-medium"
             >
               Beställ jobb
             </Link>
@@ -162,8 +211,8 @@ export default function Header() {
                 <>
                   <Link
                     href="/dashboard"
-                    className="block px-3 py-2 text-[hsl(var(--primary))] hover:bg-[hsl(var(--primary)/0.05)] rounded-md font-medium"
                     onClick={() => setMobileMenuOpen(false)}
+                    className="block px-3 py-2 text-[hsl(var(--primary))] hover:bg-[hsl(var(--primary)/0.05)] rounded-md font-medium"
                   >
                     Mina jobb
                   </Link>
@@ -187,21 +236,40 @@ export default function Header() {
                 <>
                   <Link
                     href="/sign-in"
-                    className="block w-full text-left px-3 py-2 text-[hsl(var(--primary))] hover:bg-[hsl(var(--primary)/0.05)] rounded-md font-medium transition"
                     onClick={() => setMobileMenuOpen(false)}
+                    className="block w-full text-left px-3 py-2 text-[hsl(var(--primary))] hover:bg-[hsl(var(--primary)/0.05)] rounded-md font-medium transition"
                   >
                     Logga in
                   </Link>
                   <Link
                     href="/sign-up"
-                    className="block w-full text-left mt-2 px-3 py-2 bg-[hsl(var(--accent))] text-white rounded-md font-medium hover:bg-[hsl(var(--accent)/0.9)] transition"
                     onClick={() => setMobileMenuOpen(false)}
+                    className="block w-full text-left mt-2 px-3 py-2 bg-[hsl(var(--accent))] text-white rounded-md font-medium hover:bg-[hsl(var(--accent)/0.9)] transition"
                   >
                     Registrera
                   </Link>
                 </>
               )}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Mobile Settings Dropdown */}
+      {settingsOpenMobile && isLoggedIn && (
+        <div className="md:hidden border-t border-[hsl(var(--border))] bg-[hsl(var(--card))]">
+          <div className="px-4 pt-2 pb-3 space-y-1">
+            {navItems.map(item => (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={() => setSettingsOpenMobile(false)}
+                className="flex items-center space-x-2 px-3 py-2 hover:bg-[hsl(var(--muted))] rounded-md text-[hsl(var(--foreground))]"
+              >
+                <item.icon size={18} />
+                <span>{item.label}</span>
+              </Link>
+            ))}
           </div>
         </div>
       )}
