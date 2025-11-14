@@ -97,26 +97,41 @@ export default function GolvlaggningPage() {
         </ul>
       </section>
 
-      {/* Kundcitat */}
-      <section className="mb-16">
-        <h2 className="text-2xl font-semibold text-foreground mb-6 text-center flex justify-center items-center gap-2">
-          <MessageSquare className="w-5 h-5 text-[hsl(var(--primary))]" /> Kundcitat
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-card border border-border rounded-2xl shadow-sm p-6">
-            <p className="text-muted-foreground mb-4">
-              “Vimon gjorde ett fantastiskt jobb med vårt vardagsrumsgolv! Snabbt, smidigt och väldigt noggrant.”
-            </p>
-            <p className="font-semibold text-foreground">– Anna, Malmö</p>
-          </div>
-          <div className="bg-card border border-border rounded-2xl shadow-sm p-6">
-            <p className="text-muted-foreground mb-4">
-              “Vi är supernöjda med golvläggningen. Tydlig kommunikation och snygg finish. Rekommenderas starkt!”
-            </p>
-            <p className="font-semibold text-foreground">– Johan, Lund</p>
-          </div>
-        </div>
-      </section>
+{/* Kundcitat - scroll/karusell */}
+<section className="mb-16">
+  <h2 className="text-2xl font-semibold text-foreground mb-6 text-center flex justify-center items-center gap-2">
+    <MessageSquare className="w-5 h-5 text-[hsl(var(--primary))]" /> Kundcitat
+  </h2>
+  
+  <div className="overflow-x-auto py-2 -mx-4 px-4">
+    <div className="flex gap-6 min-w-max">
+      <div className="bg-card border border-border rounded-2xl shadow-sm p-6 min-w-[300px] flex-shrink-0">
+        <p className="text-muted-foreground mb-4">
+          “Vimon gjorde ett fantastiskt jobb med vårt vardagsrumsgolv! Snabbt, smidigt och väldigt noggrant.”
+        </p>
+        <p className="font-semibold text-foreground">– Anna, Malmö</p>
+      </div>
+      <div className="bg-card border border-border rounded-2xl shadow-sm p-6 min-w-[300px] flex-shrink-0">
+        <p className="text-muted-foreground mb-4">
+          “Vi är supernöjda med golvläggningen. Tydlig kommunikation och snygg finish. Rekommenderas starkt!”
+        </p>
+        <p className="font-semibold text-foreground">– Johan, Lund</p>
+      </div>
+      <div className="bg-card border border-border rounded-2xl shadow-sm p-6 min-w-[300px] flex-shrink-0">
+        <p className="text-muted-foreground mb-4">
+          “Otroligt proffsigt arbete. Golvet ser ut precis som vi drömt om.”
+        </p>
+        <p className="font-semibold text-foreground">– Sara, Helsingborg</p>
+      </div>
+      <div className="bg-card border border-border rounded-2xl shadow-sm p-6 min-w-[300px] flex-shrink-0">
+        <p className="text-muted-foreground mb-4">
+          “Rekommenderar Vimon till alla som vill ha ett golv gjort på rätt sätt.”
+        </p>
+        <p className="font-semibold text-foreground">– Erik, Malmö</p>
+      </div>
+    </div>
+  </div>
+</section>
 
       {/* CTA */}
       <section className="text-center bg-[hsl(var(--primary)/0.05)] py-12 rounded-2xl">
