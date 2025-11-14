@@ -1,3 +1,4 @@
+// app/(dashboard)/dashboard/page.tsx
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -49,7 +50,7 @@ function ManageSubscription() {
         <div className="space-y-4">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
             <div className="mb-4 sm:mb-0">
-              <p className="font-medium">
+              <p className="font-medium text-foreground">
                 Current Plan: {teamData?.planName || 'Free'}
               </p>
               <p className="text-sm text-muted-foreground">
@@ -81,10 +82,10 @@ function TeamMembersSkeleton() {
       <CardContent>
         <div className="animate-pulse space-y-4 mt-1">
           <div className="flex items-center space-x-4">
-            <div className="size-8 rounded-full bg-gray-200"></div>
+            <div className="size-8 rounded-full bg-muted/50"></div>
             <div className="space-y-2">
-              <div className="h-4 w-32 bg-gray-200 rounded"></div>
-              <div className="h-3 w-14 bg-gray-200 rounded"></div>
+              <div className="h-4 w-32 bg-muted/50 rounded"></div>
+              <div className="h-3 w-14 bg-muted/50 rounded"></div>
             </div>
           </div>
         </div>
@@ -128,15 +129,6 @@ function TeamMembers() {
             <li key={member.id} className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 <Avatar>
-                  {/* 
-                    This app doesn't save profile images, but here
-                    is how you'd show them:
-
-                    <AvatarImage
-                      src={member.user.image || ''}
-                      alt={getUserDisplayName(member.user)}
-                    />
-                  */}
                   <AvatarFallback>
                     {getUserDisplayName(member.user)
                       .split(' ')
@@ -145,7 +137,7 @@ function TeamMembers() {
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="font-medium">
+                  <p className="font-medium text-foreground">
                     {getUserDisplayName(member.user)}
                   </p>
                   <p className="text-sm text-muted-foreground capitalize">
@@ -170,7 +162,7 @@ function TeamMembers() {
           ))}
         </ul>
         {removeState?.error && (
-          <p className="text-red-500 mt-4">{removeState.error}</p>
+          <p className="text-destructive mt-4">{removeState.error}</p>
         )}
       </CardContent>
     </Card>
@@ -234,14 +226,14 @@ function InviteTeamMember() {
             </RadioGroup>
           </div>
           {inviteState?.error && (
-            <p className="text-red-500">{inviteState.error}</p>
+            <p className="text-destructive">{inviteState.error}</p>
           )}
           {inviteState?.success && (
-            <p className="text-green-500">{inviteState.success}</p>
+            <p className="text-[hsl(var(--primary))]">{inviteState.success}</p>
           )}
           <Button
             type="submit"
-            className="bg-orange-500 hover:bg-orange-600 text-white"
+            className="bg-[hsl(var(--accent))] hover:bg-[hsl(var(--accent)/0.9)] text-[hsl(var(--accent-foreground))]"
             disabled={isInvitePending || !isOwner}
           >
             {isInvitePending ? (
@@ -271,8 +263,8 @@ function InviteTeamMember() {
 
 export default function SettingsPage() {
   return (
-    <section className="flex-1 p-4 lg:p-8">
-      <h1 className="text-lg lg:text-2xl font-medium mb-6">Team Settings</h1>
+    <section className="flex-1 p-4 lg:p-8 bg-background">
+      <h1 className="text-lg lg:text-2xl font-medium text-foreground mb-6">Team Settings</h1>
       <Suspense fallback={<SubscriptionSkeleton />}>
         <ManageSubscription />
       </Suspense>

@@ -1,19 +1,61 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
-import { Menu, X, LogOut } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Menu, X, LogOut, Moon, Sun } from 'lucide-react';
 import useSWR from 'swr';
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isDark, setIsDark] = useState(false);
   const { data: user, error } = useSWR('/api/user', fetcher);
   const isLoggedIn = !!user && !error;
 
+  // Automatisk dark mode + localStorage
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+      document.documentElement.classList.add('dark');
+      setIsDark(true);
+    } else {
+      document.documentElement.classList.remove('dark');
+      setIsDark(false);
+    }
+
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = (e: MediaQueryListEvent) => {
+      if (!localStorage.getItem('theme')) {
+        if (e.matches) {
+          document.documentElement.classList.add('dark');
+          setIsDark(true);
+        } else {
+          document.documentElement.classList.remove('dark');
+          setIsDark(false);
+        }
+      }
+    };
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, []);
+
+  const toggleTheme = () => {
+    if (document.documentElement.classList.contains('dark')) {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+      setIsDark(false);
+    } else {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+      setIsDark(true);
+    }
+  };
+
   return (
-    <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
+    <header className="bg-[hsl(var(--card))] border-b border-[hsl(var(--border))] sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
 
@@ -27,13 +69,24 @@ export default function Header() {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <Link href="/tjanster" className="text-gray-700 hover:text-blue-600 font-medium transition">
+            <Link 
+              href="/tjanster" 
+              className="text-[hsl(var(--foreground))] hover:text-[hsl(var(--primary))] font-medium transition"
+            >
               Beställ jobb
             </Link>
           </nav>
 
-          {/* Desktop Auth */}
+          {/* Desktop Auth + Dark Mode Toggle */}
           <div className="hidden md:flex items-center space-x-3">
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-lg text-[hsl(var(--foreground))] hover:bg-[hsl(var(--muted))] transition"
+              aria-label="Byt till mörkt/ljust läge"
+            >
+              {isDark ? <Sun size={20} /> : <Moon size={20} />}
+            </button>
+
             {isLoggedIn ? (
               <div className="flex items-center space-x-4">
                 <Link
@@ -47,7 +100,7 @@ export default function Header() {
                     {user.email[0].toUpperCase()}
                   </div>
                   <form action="/api/auth/signout" method="post">
-                    <button className="text-gray-600 hover:text-red-600 transition">
+                    <button className="text-[hsl(var(--destructive))] hover:text-[hsl(var(--destructive)/0.8)] transition">
                       <LogOut size={18} />
                     </button>
                   </form>
@@ -74,7 +127,7 @@ export default function Header() {
           {/* Mobile menu button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 rounded-md text-gray-700 hover:bg-gray-100"
+            className="md:hidden p-2 rounded-md text-[hsl(var(--foreground))] hover:bg-[hsl(var(--muted))]"
           >
             {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
@@ -83,19 +136,28 @@ export default function Header() {
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-gray-200 bg-white">
+        <div className="md:hidden border-t border-[hsl(var(--border))] bg-[hsl(var(--card))]">
           <div className="px-4 pt-2 pb-3 space-y-1">
             <Link
               href="/tjanster"
-              className="block px-3 py-2 text-gray-700 hover:bg-gray-100 rounded-md font-medium"
+              className="block px-3 py-2 text-[hsl(var(--foreground))] hover:bg-[hsl(var(--muted))] rounded-md font-medium"
               onClick={() => setMobileMenuOpen(false)}
             >
               Beställ jobb
             </Link>
-            
 
-            {/* Mobile Auth */}
-            <div className="pt-4 pb-3 border-t border-gray-200 mt-3">
+            <button
+              onClick={() => {
+                toggleTheme();
+                setMobileMenuOpen(false);
+              }}
+              className="flex w-full items-center px-3 py-2 text-[hsl(var(--foreground))] hover:bg-[hsl(var(--muted))] rounded-md font-medium transition"
+            >
+              {isDark ? <Sun className="mr-2" size={18} /> : <Moon className="mr-2" size={18} />}
+              {isDark ? 'Ljust läge' : 'Mörkt läge'}
+            </button>
+
+            <div className="pt-4 pb-3 border-t border-[hsl(var(--border))] mt-3">
               {isLoggedIn ? (
                 <>
                   <Link
@@ -115,7 +177,7 @@ export default function Header() {
                       </span>
                     </div>
                     <form action="/api/auth/signout" method="post">
-                      <button className="text-red-600 hover:text-red-700">
+                      <button className="text-[hsl(var(--destructive))] hover:text-[hsl(var(--destructive)/0.8)]">
                         <LogOut size={20} />
                       </button>
                     </form>

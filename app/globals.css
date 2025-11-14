@@ -31,14 +31,15 @@
 .dark {
   --background: 213 39% 10%;
   --foreground: 0 0% 98%;
-  --card: 213 39% 12%;
+  --card: 213 39% 16%;
   --card-foreground: 0 0% 98%;
   --primary: 82 60% 55%;
   --primary-foreground: 0 0% 100%;
-  --accent: 213 39% 25%;
+  --accent: 82 60% 45%;
   --accent-foreground: 0 0% 98%;
-  --border: 213 39% 20%;
+  --border: 213 39% 25%;
   --ring: 82 60% 70%;
+  --muted: 213 39% 20%;
 }
 
 /* Bas-styling */

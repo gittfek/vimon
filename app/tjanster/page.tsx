@@ -1,4 +1,4 @@
-// app/services/page.tsx
+// app/tjanster/page.tsx
 import Link from "next/link";
 import {
   Hammer,
@@ -53,8 +53,8 @@ export default function ServicesPage() {
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
       {/* Hero */}
       <section className="text-center mb-16">
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">Våra tjänster</h1>
-        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+        <h1 className="text-4xl font-bold text-foreground mb-4">Våra tjänster</h1>
+        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
           Vimon specialiserar sig på mindre jobb till fastpris. Enkelt, snabbt
           och tryggt — utan att behöva boka totalentreprenad.
         </p>
@@ -65,22 +65,22 @@ export default function ServicesPage() {
         {services.map((service, i) => (
           <div
             key={i}
-            className="bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md hover:border-gray-200 transition-all p-6 flex flex-col justify-between"
+            className="bg-card border border-border rounded-2xl shadow-sm hover:shadow-md hover:border-border/50 transition-all p-6 flex flex-col justify-between"
           >
             <div>
               <div className="w-12 h-12 rounded-xl bg-[hsl(var(--primary)/0.1)] flex items-center justify-center mb-4">
                 {service.icon}
               </div>
-              <h3 className="text-xl font-semibold mb-2 text-gray-900">
+              <h3 className="text-xl font-semibold mb-2 text-foreground">
                 {service.title}
               </h3>
-              <p className="text-gray-600 mb-4">{service.desc}</p>
+              <p className="text-muted-foreground mb-4">{service.desc}</p>
             </div>
             <Link
               href={`/tjanster/${service.slug}`}
               className="mt-auto inline-block text-[hsl(var(--primary))] font-medium hover:underline"
             >
-              Beställ jobb →
+              Beställ jobb
             </Link>
           </div>
         ))}
@@ -88,15 +88,15 @@ export default function ServicesPage() {
 
       {/* CTA */}
       <section className="text-center bg-[hsl(var(--primary)/0.05)] py-12 rounded-2xl">
-        <h2 className="text-2xl font-semibold mb-3">
+        <h2 className="text-2xl font-semibold text-foreground mb-3">
           Redo att boka ditt nästa projekt?
         </h2>
-        <p className="text-gray-600 mb-6">
+        <p className="text-muted-foreground mb-6">
           Skapa ett konto på under en minut och beställ ditt jobb direkt.
         </p>
         <Link
           href="/sign-up"
-          className="inline-block bg-[hsl(var(--accent))] text-white px-6 py-3 rounded-lg font-medium hover:bg-[hsl(var(--accent)/0.9)] transition shadow-sm"
+          className="inline-block bg-[hsl(var(--accent))] text-[hsl(var(--accent-foreground))] px-6 py-3 rounded-lg font-medium hover:bg-[hsl(var(--accent)/0.9)] transition shadow-sm"
         >
           Kom igång
         </Link>
