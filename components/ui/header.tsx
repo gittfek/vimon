@@ -156,29 +156,34 @@ export default function Header() {
             )}
           </div>
 
-          {/* Mobile settings button */}
-          {isLoggedIn && (
-            <button
-              onClick={() => {
-                setSettingsOpenMobile(prev => !prev);
-                setMobileMenuOpen(false);
-              }}
-              className="md:hidden p-2 rounded-md text-[hsl(var(--foreground))] hover:bg-[hsl(var(--muted))]"
-            >
-              <Settings size={22} />
-            </button>
-          )}
+{/* Mobile action buttons (right side) */}
+<div className="md:hidden flex items-center space-x-2">
 
-          {/* Mobile menu button */}
-          <button
-            onClick={() => {
-              setMobileMenuOpen(prev => !prev);
-              setSettingsOpenMobile(false);
-            }}
-            className="md:hidden p-2 rounded-md text-[hsl(var(--foreground))] hover:bg-[hsl(var(--muted))]"
-          >
-            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
+  {/* Settings (mobile) */}
+  {isLoggedIn && (
+    <button
+      onClick={() => {
+        setSettingsOpenMobile(prev => !prev);
+        setMobileMenuOpen(false);
+      }}
+      className="p-2 rounded-md text-[hsl(var(--foreground))] hover:bg-[hsl(var(--muted))]"
+    >
+      <Settings size={22} />
+    </button>
+  )}
+
+  {/* Hamburger */}
+  <button
+    onClick={() => {
+      setMobileMenuOpen(prev => !prev);
+      setSettingsOpenMobile(false);
+    }}
+    className="p-2 rounded-md text-[hsl(var(--foreground))] hover:bg-[hsl(var(--muted))]"
+  >
+    {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+  </button>
+
+</div>
 
         </div>
       </div>
