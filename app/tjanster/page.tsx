@@ -68,7 +68,7 @@ export default function ServicesPage() {
       {services.map((service, i) => (
         <Link
           key={i}
-          href={tjanster.slug}
+          href={`/tjanster/${service.slug}`}
           className="group bg-background border border-border rounded-2xl p-6 flex flex-col items-center hover:shadow-md transition"
         >
           <div className="w-12 h-12 rounded-xl bg-[hsl(var(--primary)/0.1)] flex items-center justify-center mb-4 group-hover:bg-[hsl(var(--primary)/0.15)] transition">
