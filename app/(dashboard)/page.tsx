@@ -32,7 +32,7 @@ export default function HomePage() {
           <h2 className="text-3xl font-bold text-foreground text-center mb-12">Våra mest populära tjänster</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {services.map((service, i) => (
-              <Link key={i} href={service.slug} className="bg-background border border-border rounded-2xl p-6 flex flex-col items-center hover:shadow-md transition">
+              <Link key={i} href={`/tjanster/${service.slug}`} className="bg-background border border-border rounded-2xl p-6 flex flex-col items-center hover:shadow-md transition">
                 <div className="w-12 h-12 rounded-xl bg-[hsl(var(--primary)/0.1)] flex items-center justify-center mb-4">
                   {service.icon}
                 </div>
