@@ -29,9 +29,7 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
         </div>
 
         <h2 className="mt-6 text-center text-3xl font-medium text-foreground">
-          {mode === 'signin'
-            ? 'Sign in to your account'
-            : 'Create your account'}
+          {mode === 'signin' ? 'Logga in på ditt konto' : 'Skapa ett konto'}
         </h2>
       </div>
 
@@ -42,7 +40,7 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
           <input type="hidden" name="inviteId" value={inviteId || ''} />
 
           <div>
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">E-post</Label>
             <Input
               id="email"
               name="email"
@@ -51,12 +49,12 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
               defaultValue={state.email}
               required
               maxLength={50}
-              placeholder="Enter your email"
+              placeholder="Ange din e-post"
             />
           </div>
 
           <div>
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">Lösenord</Label>
             <Input
               id="password"
               name="password"
@@ -68,7 +66,7 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
               required
               minLength={8}
               maxLength={100}
-              placeholder="Enter your password"
+              placeholder="Ange ditt lösenord"
             />
           </div>
 
@@ -85,12 +83,12 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
               {pending ? (
                 <>
                   <Loader2 className="animate-spin mr-2 h-4 w-4" />
-                  Loading...
+                  Loggar in...
                 </>
               ) : mode === 'signin' ? (
-                'Sign in'
+                'Logga in'
               ) : (
-                'Sign up'
+                'Skapa konto'
               )}
             </Button>
           </div>
@@ -103,9 +101,7 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
             </div>
             <div className="relative flex justify-center text-sm">
               <span className="px-2 bg-background text-muted-foreground">
-                {mode === 'signin'
-                  ? 'New to our platform?'
-                  : 'Already have an account?'}
+                {mode === 'signin' ? 'Ny här?' : 'Har du redan ett konto?'}
               </span>
             </div>
           </div>
@@ -118,8 +114,8 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
               className="w-full flex justify-center py-2 px-4 border rounded-md text-sm font-medium text-foreground bg-background border-input hover:bg-muted transition"
             >
               {mode === 'signin'
-                ? 'Create an account'
-                : 'Sign in to existing account'}
+                ? 'Skapa ett nytt konto'
+                : 'Logga in på ditt konto'}
             </Link>
           </div>
         </div>
