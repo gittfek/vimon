@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { Menu, X, LogOut, Moon, Sun, Settings, Activity, Shield, Users } from 'lucide-react';
 import useSWR from 'swr';
-import { signOut } from "next-auth/react";
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
@@ -135,12 +134,13 @@ export default function Header() {
                   <div className="w-8 h-8 bg-[hsl(var(--accent))] rounded-full flex items-center justify-center text-white text-sm font-bold">
                     {user.email[0].toUpperCase()}
                   </div>
-<button
-  onClick={() => signOut({ callbackUrl: "/" })}
-  className="text-[hsl(var(--destructive))] hover:text-[hsl(var(--destructive)/0.8)] transition"
->
-  <LogOut size={18} />
-</button>
+
+                  <form action="/api/auth/signout" method="post">
+                    <button className="text-[hsl(var(--destructive))] hover:text-[hsl(var(--destructive)/0.8)] transition">
+                      <LogOut size={18} />
+                    </button>
+                  </form>
+
                 </div>
               </div>
             ) : (
@@ -232,12 +232,13 @@ export default function Header() {
                         {user.email}
                       </span>
                     </div>
-<button
-  onClick={() => signOut({ callbackUrl: "/" })}
-  className="text-[hsl(var(--destructive))] hover:text-[hsl(var(--destructive)/0.8)]"
->
-  <LogOut size={20} />
-</button>
+
+                    <form action="/api/auth/signout" method="post">
+                      <button className="text-[hsl(var(--destructive))] hover:text-[hsl(var(--destructive)/0.8)]">
+                        <LogOut size={20} />
+                      </button>
+                    </form>
+
                   </div>
                 </>
               ) : (
