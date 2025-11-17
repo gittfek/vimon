@@ -43,9 +43,9 @@ export default function ServicesPage() {
     },
     {
       icon: <Package className="w-6 h-6 text-[hsl(var(--primary))]" />,
-      title: "Övriga småjobb",
+      title: "Be om offert",
       desc: "Kontakta oss för andra enklare bygg- och monteringsjobb.",
-      slug: "ovrigt",
+      slug: "../offert",
     },
   ];
 

@@ -13,7 +13,7 @@ export const users = pgTable('users', {
   name: varchar('name', { length: 100 }),
   email: varchar('email', { length: 255 }).notNull().unique(),
   passwordHash: text('password_hash').notNull(),
-  role: varchar('role', { length: 20 }).notNull().default('member'),
+  role: varchar('role', { length: 20 }).notNull().default('customer'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
   deletedAt: timestamp('deleted_at'),
@@ -140,3 +140,63 @@ export enum ActivityType {
   INVITE_TEAM_MEMBER = 'INVITE_TEAM_MEMBER',
   ACCEPT_INVITATION = 'ACCEPT_INVITATION',
 }
+
+
+// --- JOBS
+export const jobs = pgTable('jobs', {
+  id: serial('id').primaryKey(),
+  title: varchar('title', { length: 255 }).notNull(),
+  description: text('description'),
+  customerId: integer('customer_id').notNull().references(() => users.id),
+  createdBy: integer('created_by').references(() => users.id),
+  assignedTo: integer('assigned_to').references(() => users.id),
+  teamId: integer('team_id').references(() => teams.id),
+  status: varchar('status', { length: 50 }).notNull().default('NEW'),
+  address: text('address'),
+  scheduledAt: timestamp('scheduled_at'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+});
+
+
+
+// --- JOB STATUS LOGS
+export const jobStatusLogs = pgTable('job_status_logs', {
+  id: serial('id').primaryKey(),
+  jobId: integer('job_id').notNull().references(() => jobs.id),
+  oldStatus: varchar('old_status', { length: 50 }),
+  newStatus: varchar('new_status', { length: 50 }).notNull(),
+  changedBy: integer('changed_by').references(() => users.id),
+  note: text('note'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+});
+
+// --- JOB ATTACHMENTS
+export const jobAttachments = pgTable('job_attachments', {
+  id: serial('id').primaryKey(),
+  jobId: integer('job_id').notNull().references(() => jobs.id),
+  uploadedBy: integer('uploaded_by').references(() => users.id),
+  url: text('url').notNull(),
+  filename: varchar('filename', { length: 255 }),
+  contentType: varchar('content_type', { length: 100 }),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+});
+
+
+export const jobsRelations = relations(jobs, ({ one, many }) => ({
+  customer: one(users, { fields: [jobs.customerId], references: [users.id] }),
+  assignedUser: one(users, { fields: [jobs.assignedTo], references: [users.id] }),
+  team: one(teams, { fields: [jobs.teamId], references: [teams.id] }),
+  statusLogs: many(jobStatusLogs),
+  attachments: many(jobAttachments),
+}));
+
+export const jobStatusLogsRelations = relations(jobStatusLogs, ({ one }) => ({
+  job: one(jobs, { fields: [jobStatusLogs.jobId], references: [jobs.id] }),
+  changedByUser: one(users, { fields: [jobStatusLogs.changedBy], references: [users.id] }),
+}));
+
+export const jobAttachmentsRelations = relations(jobAttachments, ({ one }) => ({
+  job: one(jobs, { fields: [jobAttachments.jobId], references: [jobs.id] }),
+  uploader: one(users, { fields: [jobAttachments.uploadedBy], references: [users.id] }),
+}));

@@ -181,7 +181,7 @@ function InviteTeamMemberSkeleton() {
 
 function InviteTeamMember() {
   const { data: user } = useSWR<User>('/api/user', fetcher);
-  const isOwner = user?.role === 'owner';
+  const isAdmin = user?.role === 'admin';
   const [inviteState, inviteAction, isInvitePending] = useActionState<
     ActionState,
     FormData
@@ -204,7 +204,7 @@ function InviteTeamMember() {
               type="email"
               placeholder="Ange e-postadress"
               required
-              disabled={!isOwner}
+              disabled={!isAdmin}
             />
           </div>
           <div>
@@ -213,15 +213,15 @@ function InviteTeamMember() {
               defaultValue="member"
               name="role"
               className="flex space-x-4"
-              disabled={!isOwner}
+              disabled={!isAdmin}
             >
               <div className="flex items-center space-x-2 mt-2">
                 <RadioGroupItem value="member" id="member" />
                 <Label htmlFor="member">Medlem</Label>
               </div>
               <div className="flex items-center space-x-2 mt-2">
-                <RadioGroupItem value="owner" id="owner" />
-                <Label htmlFor="owner">Ägare</Label>
+                <RadioGroupItem value="admin" id="admin" />
+                <Label htmlFor="admin">Admin</Label>
               </div>
             </RadioGroup>
           </div>
@@ -236,7 +236,7 @@ function InviteTeamMember() {
           <Button
             type="submit"
             className="bg-[hsl(var(--accent))] hover:bg-[hsl(var(--accent)/0.9)] text-[hsl(var(--accent-foreground))]"
-            disabled={isInvitePending || !isOwner}
+            disabled={isInvitePending || !isAdmin}
           >
             {isInvitePending ? (
               <>
@@ -252,7 +252,7 @@ function InviteTeamMember() {
           </Button>
         </form>
       </CardContent>
-      {!isOwner && (
+      {!isAdmin && (
         <CardFooter>
           <p className="text-sm text-muted-foreground">
             Du måste vara teamägare för att bjuda in nya medlemmar.
