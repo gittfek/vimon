@@ -22,7 +22,7 @@ export function UserMenu({ user }: { user: AppUser }) {
         </div>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="end" className="w-40">
+      <DropdownMenuContent align="end" className="w-40 md:hidden border-t border-[hsl(var(--border))] bg-[hsl(var(--card))]">
 
         <DropdownMenuItem asChild>
           <Link href="/profil" className="flex items-center gap-2">
