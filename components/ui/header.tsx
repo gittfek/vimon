@@ -206,12 +206,21 @@ export default function Header() {
               {isLoggedIn ? (
                 <>
                   <Link
-                    href="/dashboard"
+                    href="/kundportal"
                     onClick={() => setMobileMenuOpen(false)}
                     className="block px-3 py-2 text-[hsl(var(--primary))] hover:bg-[hsl(var(--primary)/0.05)] rounded-md font-medium"
                   >
                     Mina jobb
                   </Link>
+
+                  <Link
+                    href="/profil"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="block px-3 py-2 text-[hsl(var(--primary))] hover:bg-[hsl(var(--primary)/0.05)] rounded-md font-medium"
+                  >
+                    Min profil
+                  </Link>
+
                   <div className="flex items-center justify-between px-3 py-2">
                     <div className="flex items-center space-x-2">
                       <div className="w-8 h-8 bg-[hsl(var(--accent))] rounded-full flex items-center justify-center text-white text-sm font-bold">
