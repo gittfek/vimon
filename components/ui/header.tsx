@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { Menu, X, LogOut, Moon, Sun, Settings, Activity, Shield, Users } from 'lucide-react';
 import useSWR from 'swr';
+import { UserMenu } from "@/components/ui/user-menu";
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
@@ -129,33 +130,21 @@ export default function Header() {
 
             {/* Auth */}
             {isLoggedIn ? (
-              <div className="flex items-center space-x-4">
-                <div className="flex items-center space-x-2">
-                  <div className="w-8 h-8 bg-[hsl(var(--accent))] rounded-full flex items-center justify-center text-white text-sm font-bold">
-                    {user.email[0].toUpperCase()}
-                  </div>
+              <UserMenu user={user} />
+              ) : (
+                <>
+                  <Link href="/sign-in" className="text-[hsl(var(--primary))] hover:text-[hsl(var(--primary)/0.8)] font-medium transition">
+                    Logga in
+                  </Link>
+                  <Link
+                    href="/sign-up"
+                    className="bg-[hsl(var(--accent))] text-white px-4 py-2 rounded-lg font-medium hover:bg-[hsl(var(--accent)/0.9)] transition shadow-sm"
+                  >
+                    Registrera
+                  </Link>
+                </>
+              )}
 
-                  <form action="/api/auth/signout" method="post">
-                    <button className="text-[hsl(var(--destructive))] hover:text-[hsl(var(--destructive)/0.8)] transition">
-                      <LogOut size={18} />
-                    </button>
-                  </form>
-
-                </div>
-              </div>
-            ) : (
-              <>
-                <Link href="/sign-in" className="text-[hsl(var(--primary))] hover:text-[hsl(var(--primary)/0.8)] font-medium transition">
-                  Logga in
-                </Link>
-                <Link
-                  href="/sign-up"
-                  className="bg-[hsl(var(--accent))] text-white px-4 py-2 rounded-lg font-medium hover:bg-[hsl(var(--accent)/0.9)] transition shadow-sm"
-                >
-                  Registrera
-                </Link>
-              </>
-            )}
           </div>
 
 {/* Mobile action buttons (right side) */}
