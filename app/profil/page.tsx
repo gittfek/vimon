@@ -1,77 +1,96 @@
 'use client';
 
-import { useState, Suspense } from 'react';
-import { useActionState } from '@/app/(login)/actions';
+import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { Loader2, Edit, Lock, Trash2 } from 'lucide-react';
+import { Loader2, Edit } from 'lucide-react';
 import useSWR from 'swr';
-import { User } from '@/lib/db/schema';
-import { updateAccount, updatePassword, deleteAccount } from '@/app/(login)/actions';
+import { Suspense } from 'react';
 
 const fetcher = (url: string) => fetch(url).then(res => res.json());
 
-/* --------------------- Account Info --------------------- */
-type AccountState = {
-  name?: string;
-  email?: string;
-  error?: string;
-  success?: string;
-};
-
-function AccountForm({ state }: { state: AccountState }) {
-  const { data: user } = useSWR<User>('/api/customer/me', fetcher);
-
+function AccountSkeleton() {
   return (
-    <form className="space-y-4">
-      <div>
-        <Label htmlFor="name" className="mb-2">Namn</Label>
-        <Input
-          id="name"
-          name="name"
-          defaultValue={state.name || user?.name || ''}
-          placeholder="Ange namn"
-          required
-        />
-      </div>
-      <div>
-        <Label htmlFor="email" className="mb-2">E-post</Label>
-        <Input
-          id="email"
-          name="email"
-          type="email"
-          defaultValue={state.email || user?.email || ''}
-          placeholder="Ange e-post"
-          required
-        />
-      </div>
-    </form>
+    <Card className="mb-8 h-[160px]">
+      <CardHeader>
+        <CardTitle>Dina uppgifter</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="animate-pulse space-y-4 mt-1">
+          <div className="h-4 w-32 bg-muted/50 rounded"></div>
+          <div className="h-4 w-48 bg-muted/50 rounded"></div>
+          <div className="h-4 w-28 bg-muted/50 rounded"></div>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 
-function AccountCard() {
-  const [state, formAction, isPending] = useActionState<AccountState, FormData>(updateAccount, {});
+function AccountForm() {
+  const { data: user } = useSWR('/api/customer/me', fetcher);
+  const [isSaving, setIsSaving] = useState(false);
+  const [success, setSuccess] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsSaving(true);
+    setSuccess(null);
+    setError(null);
+
+    const formData = Object.fromEntries(new FormData(e.currentTarget).entries());
+
+    try {
+      const res = await fetch('/api/customer/me/update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+      if (!res.ok) throw new Error('Något gick fel vid sparande');
+      setSuccess('Uppgifter sparade!');
+    } catch (err: any) {
+      setError(err.message || 'Något gick fel');
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
     <Card className="mb-8">
       <CardHeader>
-        <CardTitle>Kontouppgifter</CardTitle>
+        <CardTitle>Dina uppgifter</CardTitle>
       </CardHeader>
       <CardContent>
-        <form className="space-y-4" action={formAction}>
-          <Suspense fallback={<AccountForm state={state} />}>
-            <AccountForm state={state} />
-          </Suspense>
-          {state.error && <p className="text-destructive">{state.error}</p>}
-          {state.success && <p className="text-[hsl(var(--primary))]">{state.success}</p>}
-          <Button
-            type="submit"
-            className="bg-[hsl(var(--accent))] hover:bg-[hsl(var(--accent)/0.9)] text-[hsl(var(--accent-foreground))]"
-            disabled={isPending}
-          >
-            {isPending ? (
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <Input
+              name="name"
+              defaultValue={user?.name || ''}
+              placeholder="Namn"
+              required
+            />
+          </div>
+          <div>
+            <Input
+              name="email"
+              type="email"
+              defaultValue={user?.email || ''}
+              placeholder="E-post"
+              required
+            />
+          </div>
+          <div>
+            <Input
+              name="phone"
+              defaultValue={user?.phone || ''}
+              placeholder="Telefonnummer"
+            />
+          </div>
+          {error && <p className="text-destructive">{error}</p>}
+          {success && <p className="text-[hsl(var(--primary))]">{success}</p>}
+          <Button type="submit" disabled={isSaving}>
+            {isSaving ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Sparar...
@@ -89,80 +108,61 @@ function AccountCard() {
   );
 }
 
-/* --------------------- Password --------------------- */
-type PasswordState = {
-  currentPassword?: string;
-  newPassword?: string;
-  confirmPassword?: string;
-  error?: string;
-  success?: string;
-};
+function PasswordForm() {
+  const [isSaving, setIsSaving] = useState(false);
+  const [success, setSuccess] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-function PasswordCard() {
-  const [passwordState, passwordAction, isPasswordPending] = useActionState<PasswordState, FormData>(updatePassword, {});
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsSaving(true);
+    setSuccess(null);
+    setError(null);
+
+    const formData = Object.fromEntries(new FormData(e.currentTarget).entries());
+
+    try {
+      const res = await fetch('/api/customer/me/password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+      if (!res.ok) throw new Error('Kunde inte uppdatera lösenord');
+      setSuccess('Lösenord uppdaterat!');
+      e.currentTarget.reset();
+    } catch (err: any) {
+      setError(err.message || 'Något gick fel');
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
     <Card className="mb-8">
       <CardHeader>
-        <CardTitle>Lösenord</CardTitle>
+        <CardTitle>Byt lösenord</CardTitle>
       </CardHeader>
       <CardContent>
-        <form className="space-y-4" action={passwordAction}>
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label htmlFor="current-password" className="mb-2">Nuvarande lösenord</Label>
-            <Input
-              id="current-password"
-              name="currentPassword"
-              type="password"
-              autoComplete="current-password"
-              required
-              minLength={8}
-              maxLength={100}
-              defaultValue={passwordState.currentPassword}
-            />
+            <Input name="currentPassword" type="password" placeholder="Nuvarande lösenord" required />
           </div>
           <div>
-            <Label htmlFor="new-password" className="mb-2">Nytt lösenord</Label>
-            <Input
-              id="new-password"
-              name="newPassword"
-              type="password"
-              autoComplete="new-password"
-              required
-              minLength={8}
-              maxLength={100}
-              defaultValue={passwordState.newPassword}
-            />
+            <Input name="newPassword" type="password" placeholder="Nytt lösenord" required />
           </div>
           <div>
-            <Label htmlFor="confirm-password" className="mb-2">Bekräfta nytt lösenord</Label>
-            <Input
-              id="confirm-password"
-              name="confirmPassword"
-              type="password"
-              required
-              minLength={8}
-              maxLength={100}
-              defaultValue={passwordState.confirmPassword}
-            />
+            <Input name="confirmPassword" type="password" placeholder="Bekräfta nytt lösenord" required />
           </div>
-          {passwordState.error && <p className="text-destructive">{passwordState.error}</p>}
-          {passwordState.success && <p className="text-[hsl(var(--primary))]">{passwordState.success}</p>}
-          <Button
-            type="submit"
-            className="bg-[hsl(var(--accent))] hover:bg-[hsl(var(--accent)/0.9)] text-[hsl(var(--accent-foreground))]"
-            disabled={isPasswordPending}
-          >
-            {isPasswordPending ? (
+          {error && <p className="text-destructive">{error}</p>}
+          {success && <p className="text-[hsl(var(--primary))]">{success}</p>}
+          <Button type="submit" disabled={isSaving}>
+            {isSaving ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Uppdaterar...
+                Sparar...
               </>
             ) : (
-              <>
-                <Lock className="mr-2 h-4 w-4" />
-                Uppdatera lösenord
-              </>
+              <>Spara nytt lösenord</>
             )}
           </Button>
         </form>
@@ -171,79 +171,18 @@ function PasswordCard() {
   );
 }
 
-/* --------------------- Delete Account --------------------- */
-type DeleteState = {
-  password?: string;
-  error?: string;
-  success?: string;
-};
-
-function DeleteCard() {
-  const [deleteState, deleteAction, isDeletePending] = useActionState<DeleteState, FormData>(deleteAccount, {});
-
-  return (
-    <Card className="mb-8">
-      <CardHeader>
-        <CardTitle>Radera konto</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <p className="text-sm text-muted-foreground mb-4">
-          Konto raderas permanent och kan inte återställas.
-        </p>
-        <form className="space-y-4" action={deleteAction}>
-          <div>
-            <Label htmlFor="delete-password" className="mb-2">Bekräfta lösenord</Label>
-            <Input
-              id="delete-password"
-              name="password"
-              type="password"
-              required
-              minLength={8}
-              maxLength={100}
-              defaultValue={deleteState.password}
-            />
-          </div>
-          {deleteState.error && <p className="text-destructive">{deleteState.error}</p>}
-          {deleteState.success && <p className="text-[hsl(var(--primary))]">{deleteState.success}</p>}
-          <Button
-            type="submit"
-            variant="destructive"
-            className="bg-red-600 hover:bg-red-700"
-            disabled={isDeletePending}
-          >
-            {isDeletePending ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Tar bort...
-              </>
-            ) : (
-              <>
-                <Trash2 className="mr-2 h-4 w-4" />
-                Radera konto
-              </>
-            )}
-          </Button>
-        </form>
-      </CardContent>
-    </Card>
-  );
-}
-
-/* --------------------- Main Page --------------------- */
-export default function ProfilePage() {
+export default function AccountPage() {
   return (
     <section className="flex-1 p-4 lg:p-8 bg-background">
       <h1 className="text-lg lg:text-2xl font-medium text-foreground mb-6">
         Mitt konto
       </h1>
 
-      <Suspense fallback={<AccountCard />}>
-        <AccountCard />
+      <Suspense fallback={<AccountSkeleton />}>
+        <AccountForm />
       </Suspense>
 
-      <PasswordCard />
-
-      <DeleteCard />
+      <PasswordForm />
     </section>
   );
 }
