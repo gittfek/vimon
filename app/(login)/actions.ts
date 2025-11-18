@@ -1,6 +1,168 @@
 'use server';
 
 import { z } from 'zod';
+import { eq, sql } from 'drizzle-orm';
+import { db } from '@/lib/db/drizzle';
+import { users, type User, type NewUser } from '@/lib/db/schema';
+import { comparePasswords, hashPassword, setSession } from '@/lib/auth/session';
+import { redirect } from 'next/navigation';
+import { cookies } from 'next/headers';
+import { getUser } from '@/lib/db/queries';
+import { validatedAction, validatedActionWithUser } from '@/lib/auth/middleware';
+
+// -------------------- SIGN IN --------------------
+const signInSchema = z.object({
+  email: z.string().email().min(3).max(255),
+  password: z.string().min(8).max(100)
+});
+
+export const signIn = validatedAction(signInSchema, async (data) => {
+  const { email, password } = data;
+
+  const [foundUser] = await db.select().from(users).where(eq(users.email, email)).limit(1);
+
+  if (!foundUser) {
+    return { error: 'Invalid email or password', email };
+  }
+
+  const isPasswordValid = await comparePasswords(password, foundUser.passwordHash);
+
+  if (!isPasswordValid) {
+    return { error: 'Invalid email or password', email };
+  }
+
+  await setSession(foundUser);
+  redirect('/dashboard');
+});
+
+// -------------------- SIGN UP --------------------
+const signUpSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8)
+});
+
+export const signUp = validatedAction(signUpSchema, async (data) => {
+  const { email, password } = data;
+
+  const [existingUser] = await db.select().from(users).where(eq(users.email, email)).limit(1);
+
+  if (existingUser) {
+    return { error: 'User already exists', email };
+  }
+
+  const passwordHash = await hashPassword(password);
+  const newUser: NewUser = { email, passwordHash, role: 'customer' };
+  const [createdUser] = await db.insert(users).values(newUser).returning();
+
+  if (!createdUser) {
+    return { error: 'Failed to create user', email };
+  }
+
+  await setSession(createdUser);
+  redirect('/dashboard');
+});
+
+// -------------------- SIGN OUT --------------------
+export async function signOut() {
+  (await cookies()).delete('session');
+  redirect('/sign-in');
+}
+
+// -------------------- UPDATE PASSWORD --------------------
+const updatePasswordSchema = z.object({
+  currentPassword: z.string().min(8).max(100),
+  newPassword: z.string().min(8).max(100),
+  confirmPassword: z.string().min(8).max(100)
+});
+
+export const updatePassword = validatedActionWithUser(
+  updatePasswordSchema,
+  async (data, _, user: User) => {
+    const { currentPassword, newPassword, confirmPassword } = data;
+
+    const isPasswordValid = await comparePasswords(currentPassword, user.passwordHash);
+    if (!isPasswordValid) return { error: 'Current password is incorrect' };
+
+    if (currentPassword === newPassword) return { error: 'New password must be different' };
+    if (newPassword !== confirmPassword) return { error: 'Passwords do not match' };
+
+    const newPasswordHash = await hashPassword(newPassword);
+    await db.update(users).set({ passwordHash: newPasswordHash }).where(eq(users.id, user.id));
+
+    return { success: 'Password updated successfully' };
+  }
+);
+
+// -------------------- DELETE ACCOUNT --------------------
+const deleteAccountSchema = z.object({
+  password: z.string().min(8).max(100)
+});
+
+export const deleteAccount = validatedActionWithUser(
+  deleteAccountSchema,
+  async (data, _, user: User) => {
+    const { password } = data;
+
+    const isPasswordValid = await comparePasswords(password, user.passwordHash);
+    if (!isPasswordValid) return { error: 'Incorrect password' };
+
+    await db.update(users)
+      .set({ deletedAt: sql`CURRENT_TIMESTAMP`, email: sql`CONCAT(email, '-', id, '-deleted')` })
+      .where(eq(users.id, user.id));
+
+    (await cookies()).delete('session');
+    redirect('/sign-in');
+  }
+);
+
+// -------------------- UPDATE ACCOUNT --------------------
+const updateAccountSchema = z.object({
+  name: z.string().min(1, 'Name is required').max(100),
+  email: z.string().email('Invalid email address')
+});
+
+export const updateAccount = validatedActionWithUser(
+  updateAccountSchema,
+  async (data, _, user: User) => {
+    const { name, email } = data;
+    await db.update(users).set({ email }).where(eq(users.id, user.id));
+    return { email, success: 'Account updated successfully' };
+  }
+);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/////////////// OLD VERSION WITH STRIPE, TEAMS, ETC.
+
+
+/*'use server';
+
+import { z } from 'zod';
 import { and, eq, sql } from 'drizzle-orm';
 import { db } from '@/lib/db/drizzle';
 import {
@@ -457,3 +619,4 @@ export const inviteTeamMember = validatedActionWithUser(
     return { success: 'Invitation sent successfully' };
   }
 );
+*/

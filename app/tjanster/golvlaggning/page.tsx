@@ -2,6 +2,8 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Hammer, Clock, Layers, DollarSign, Info, MessageSquare } from "lucide-react";
+import JobForm from '@/components/ui/jobform';
+import { Button } from '@/components/ui/button';
 
 export default function GolvlaggningPage() {
   return (
@@ -148,6 +150,20 @@ export default function GolvlaggningPage() {
           Beställ golvläggning
         </Link>
       </section>
+
+      {/* ----- FORMULÄRET ----- */}
+      <section id="boka" className="py-20 bg-white">
+        <div className="max-w-4xl mx-auto px-6">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
+            Boka golvläggning – helt kostnadsfritt offert
+          </h2>
+
+          {/* Här lägger du in din färdiga komponent */}
+          <JobForm />
+        </div>
+      </section>
+
+
     </main>
   );
 }

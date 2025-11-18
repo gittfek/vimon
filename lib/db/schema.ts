@@ -1,4 +1,4 @@
-import {
+/*import {
   pgTable,
   serial,
   varchar,
@@ -200,3 +200,153 @@ export const jobAttachmentsRelations = relations(jobAttachments, ({ one }) => ({
   job: one(jobs, { fields: [jobAttachments.jobId], references: [jobs.id] }),
   uploader: one(users, { fields: [jobAttachments.uploadedBy], references: [users.id] }),
 }));
+
+*/
+
+
+
+
+
+
+
+
+
+
+
+import {
+  pgTable,
+  serial,
+  varchar,
+  text,
+  timestamp,
+  integer,
+} from 'drizzle-orm/pg-core';
+import { relations } from 'drizzle-orm';
+
+// ----------------------
+// Users (auth + role)
+// ----------------------
+export const users = pgTable('users', {
+  id: serial('id').primaryKey(),
+  email: varchar('email', { length: 255 }).notNull().unique(),
+  passwordHash: text('password_hash').notNull(),
+  role: varchar('role', { length: 20 }).notNull().default('customer'), // customer | admin | worker
+  customerId: integer('customer_id').references(() => customers.id),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+  deletedAt: timestamp('deleted_at'),
+});
+
+// ----------------------
+// Customers (persons who book jobs)
+// ----------------------
+export const customers = pgTable('customers', {
+  id: serial('id').primaryKey(),
+  name: varchar('name', { length: 100 }).notNull(),
+  email: varchar('email', { length: 255 }).notNull().unique(),
+  phone: varchar('phone', { length: 50 }),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+});
+
+// ----------------------
+// Job Types / Categories
+// ----------------------
+export const jobTypes = pgTable('job_types', {
+  id: serial('id').primaryKey(),
+  slug: varchar('slug', { length: 100 }).notNull().unique(), // ex. golvlaggning
+  name: varchar('name', { length: 255 }).notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+});
+
+// ----------------------
+// Jobs
+// ----------------------
+export const jobs = pgTable('jobs', {
+  id: serial('id').primaryKey(),
+  customerId: integer('customer_id').notNull().references(() => customers.id),
+  jobTypeId: integer('job_type_id').notNull().references(() => jobTypes.id),
+  createdBy: integer('created_by').references(() => users.id), // admin or worker creating job
+  assignedTo: integer('assigned_to').references(() => users.id), // optional assignment to worker
+  status: varchar('status', { length: 50 }).notNull().default('NEW'),
+  title: varchar('title', { length: 255 }),
+  description: text('description'),
+  address: text('address'),
+  scheduledAt: timestamp('scheduled_at'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+});
+
+// ----------------------
+// Job Attachments
+// ----------------------
+export const jobAttachments = pgTable('job_attachments', {
+  id: serial('id').primaryKey(),
+  jobId: integer('job_id').notNull().references(() => jobs.id),
+  uploadedBy: integer('uploaded_by').references(() => users.id),
+  url: text('url').notNull(),
+  filename: varchar('filename', { length: 255 }),
+  contentType: varchar('content_type', { length: 100 }),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+});
+
+// ----------------------
+// Job Status Logs
+// ----------------------
+export const jobStatusLogs = pgTable('job_status_logs', {
+  id: serial('id').primaryKey(),
+  jobId: integer('job_id').notNull().references(() => jobs.id),
+  oldStatus: varchar('old_status', { length: 50 }),
+  newStatus: varchar('new_status', { length: 50 }).notNull(),
+  changedBy: integer('changed_by').references(() => users.id),
+  note: text('note'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+});
+
+// ----------------------
+// Relations
+// ----------------------
+export const usersRelations = relations(users, ({ one }) => ({
+  customer: one(customers, { fields: [users.customerId], references: [customers.id] }),
+}));
+
+export const customersRelations = relations(customers, ({ many }) => ({
+  jobs: many(jobs),
+  users: many(users),
+}));
+
+export const jobsRelations = relations(jobs, ({ one, many }) => ({
+  customer: one(customers, { fields: [jobs.customerId], references: [customers.id] }),
+  jobType: one(jobTypes, { fields: [jobs.jobTypeId], references: [jobTypes.id] }),
+  createdByUser: one(users, { fields: [jobs.createdBy], references: [users.id] }),
+  assignedUser: one(users, { fields: [jobs.assignedTo], references: [users.id] }),
+  attachments: many(jobAttachments),
+  statusLogs: many(jobStatusLogs),
+}));
+
+export const jobAttachmentsRelations = relations(jobAttachments, ({ one }) => ({
+  job: one(jobs, { fields: [jobAttachments.jobId], references: [jobs.id] }),
+  uploader: one(users, { fields: [jobAttachments.uploadedBy], references: [users.id] }),
+}));
+
+export const jobStatusLogsRelations = relations(jobStatusLogs, ({ one }) => ({
+  job: one(jobs, { fields: [jobStatusLogs.jobId], references: [jobs.id] }),
+  changedByUser: one(users, { fields: [jobStatusLogs.changedBy], references: [users.id] }),
+}));
+
+// ----------------------
+// TypeScript types
+// ----------------------
+export type User = typeof users.$inferSelect;
+export type NewUser = typeof users.$inferInsert;
+export type Customer = typeof customers.$inferSelect;
+export type NewCustomer = typeof customers.$inferInsert;
+export type JobType = typeof jobTypes.$inferSelect;
+export type NewJobType = typeof jobTypes.$inferInsert;
+export type Job = typeof jobs.$inferSelect;
+export type NewJob = typeof jobs.$inferInsert;
+export type JobAttachment = typeof jobAttachments.$inferSelect;
+export type NewJobAttachment = typeof jobAttachments.$inferInsert;
+export type JobStatusLog = typeof jobStatusLogs.$inferSelect;
+export type NewJobStatusLog = typeof jobStatusLogs.$inferInsert;

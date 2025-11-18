@@ -1,286 +1,116 @@
 // app/(dashboard)/dashboard/page.tsx
-'use client';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { User, Hammer, ClipboardList } from 'lucide-react';
+//import { requireAdmin } from '@/lib/auth/requireAdmin';
 
-import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardFooter
-} from '@/components/ui/card';
-import { customerPortalAction } from '@/lib/payments/actions';
-import { useActionState } from 'react';
-import { TeamDataWithMembers, User } from '@/lib/db/schema';
-import { removeTeamMember, inviteTeamMember } from '@/app/(login)/actions';
-import useSWR from 'swr';
-import { Suspense } from 'react';
-import { Input } from '@/components/ui/input';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Label } from '@/components/ui/label';
-import { Loader2, PlusCircle } from 'lucide-react';
 
-type ActionState = {
-  error?: string;
-  success?: string;
-};
+export default async function AdminDashboardPage() {
+  // Server-side kontroll av admin
+  //const user = await requireAdmin();
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
+  // Placeholder-data
+  const newJobs = [
+    { id: 1, type: 'Golvläggning', status: 'pending' },
+    { id: 2, type: 'Badrumsrenovering', status: 'pending' },
+    { id: 3, type: 'Målning', status: 'pending' },
+  ];
 
-function SubscriptionSkeleton() {
-  return (
-    <Card className="mb-8 h-[140px]">
-      <CardHeader>
-        <CardTitle>Team-abonnemang</CardTitle>
-      </CardHeader>
-    </Card>
-  );
-}
+  const ongoingJobs = [
+    { id: 4, type: 'Snickeri', status: 'in progress' },
+    { id: 5, type: 'Elektriker', status: 'assigned' },
+  ];
 
-function ManageSubscription() {
-  const { data: teamData } = useSWR<TeamDataWithMembers>('/api/team', fetcher);
+  const availableWorkers = [
+    { id: 1, name: 'Erik Svensson', trade: 'Snickare' },
+    { id: 2, name: 'Anna Karlsson', trade: 'Elektriker' },
+    { id: 3, name: 'Johan Nilsson', trade: 'Målare' },
+  ];
 
-  return (
-    <Card className="mb-8">
-      <CardHeader>
-        <CardTitle>Team-abonnemang</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
-            <div className="mb-4 sm:mb-0">
-              <p className="font-medium text-foreground">
-                Nuvarande plan: {teamData?.planName || 'Gratis'}
-              </p>
-              <p className="text-sm text-muted-foreground">
-                {teamData?.subscriptionStatus === 'active'
-                  ? 'Debiteras månadsvis'
-                  : teamData?.subscriptionStatus === 'trialing'
-                  ? 'Provsperiod'
-                  : 'Inget aktivt abonnemang'}
-              </p>
-            </div>
-            <form action={customerPortalAction}>
-              <Button type="submit" variant="outline">
-                Hantera abonnemang
-              </Button>
-            </form>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-function TeamMembersSkeleton() {
-  return (
-    <Card className="mb-8 h-[140px]">
-      <CardHeader>
-        <CardTitle>Team-medlemmar</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="animate-pulse space-y-4 mt-1">
-          <div className="flex items-center space-x-4">
-            <div className="size-8 rounded-full bg-muted/50"></div>
-            <div className="space-y-2">
-              <div className="h-4 w-32 bg-muted/50 rounded"></div>
-              <div className="h-3 w-14 bg-muted/50 rounded"></div>
-            </div>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-function TeamMembers() {
-  const { data: teamData } = useSWR<TeamDataWithMembers>('/api/team', fetcher);
-  const [removeState, removeAction, isRemovePending] = useActionState<
-    ActionState,
-    FormData
-  >(removeTeamMember, {});
-
-  const getUserDisplayName = (user: Pick<User, 'id' | 'name' | 'email'>) => {
-    return user.name || user.email || 'Okänd användare';
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'in progress':
+      case 'assigned':
+        return 'bg-blue-100 text-blue-800';
+      case 'closed':
+        return 'bg-gray-100 text-gray-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
   };
 
-  if (!teamData?.teamMembers?.length) {
-    return (
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle>Team-medlemmar</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">Inga team-medlemmar ännu.</p>
-        </CardContent>
-      </Card>
-    );
-  }
-
   return (
-    <Card className="mb-8">
-      <CardHeader>
-        <CardTitle>Team-medlemmar</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <ul className="space-y-4">
-          {teamData.teamMembers.map((member, index) => (
-            <li key={member.id} className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <Avatar>
-                  <AvatarFallback>
-                    {getUserDisplayName(member.user)
-                      .split(' ')
-                      .map((n) => n[0])
-                      .join('')}
-                  </AvatarFallback>
-                </Avatar>
-                <div>
-                  <p className="font-medium text-foreground">
-                    {getUserDisplayName(member.user)}
-                  </p>
-                  <p className="text-sm text-muted-foreground capitalize">
-                    {member.role}
-                  </p>
-                </div>
-              </div>
-              {index > 1 ? (
-                <form action={removeAction}>
-                  <input type="hidden" name="memberId" value={member.id} />
-                  <Button
-                    type="submit"
-                    variant="outline"
-                    size="sm"
-                    disabled={isRemovePending}
-                  >
-                    {isRemovePending ? 'Tar bort...' : 'Ta bort'}
-                  </Button>
-                </form>
-              ) : null}
-            </li>
-          ))}
-        </ul>
-        {removeState?.error && (
-          <p className="text-destructive mt-4">{removeState.error}</p>
-        )}
-      </CardContent>
-    </Card>
-  );
-}
-
-function InviteTeamMemberSkeleton() {
-  return (
-    <Card className="h-[260px]">
-      <CardHeader>
-        <CardTitle>Bjud in team-medlem</CardTitle>
-      </CardHeader>
-    </Card>
-  );
-}
-
-function InviteTeamMember() {
-  const { data: user } = useSWR<User>('/api/user', fetcher);
-  const isAdmin = user?.role === 'admin';
-  const [inviteState, inviteAction, isInvitePending] = useActionState<
-    ActionState,
-    FormData
-  >(inviteTeamMember, {});
-
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Bjud in team-medlem</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form action={inviteAction} className="space-y-4">
-          <div>
-            <Label htmlFor="email" className="mb-2">
-              E-post
-            </Label>
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              placeholder="Ange e-postadress"
-              required
-              disabled={!isAdmin}
-            />
-          </div>
-          <div>
-            <Label>Roll</Label>
-            <RadioGroup
-              defaultValue="member"
-              name="role"
-              className="flex space-x-4"
-              disabled={!isAdmin}
-            >
-              <div className="flex items-center space-x-2 mt-2">
-                <RadioGroupItem value="member" id="member" />
-                <Label htmlFor="member">Medlem</Label>
-              </div>
-              <div className="flex items-center space-x-2 mt-2">
-                <RadioGroupItem value="admin" id="admin" />
-                <Label htmlFor="admin">Admin</Label>
-              </div>
-            </RadioGroup>
-          </div>
-
-          {inviteState?.error && (
-            <p className="text-destructive">{inviteState.error}</p>
-          )}
-          {inviteState?.success && (
-            <p className="text-[hsl(var(--primary))]">{inviteState.success}</p>
-          )}
-
-          <Button
-            type="submit"
-            className="bg-[hsl(var(--accent))] hover:bg-[hsl(var(--accent)/0.9)] text-[hsl(var(--accent-foreground))]"
-            disabled={isInvitePending || !isAdmin}
-          >
-            {isInvitePending ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Skickar...
-              </>
-            ) : (
-              <>
-                <PlusCircle className="mr-2 h-4 w-4" />
-                Bjud in medlem
-              </>
-            )}
-          </Button>
-        </form>
-      </CardContent>
-      {!isAdmin && (
-        <CardFooter>
-          <p className="text-sm text-muted-foreground">
-            Du måste vara teamägare för att bjuda in nya medlemmar.
-          </p>
-        </CardFooter>
-      )}
-    </Card>
-  );
-}
-
-export default function SettingsPage() {
-  return (
-    <section className="flex-1 p-4 lg:p-8 bg-background">
-      <h1 className="text-lg lg:text-2xl font-medium text-foreground mb-6">
-        Teaminställningar
+    <section className="flex-1 p-4 lg:p-8 bg-background space-y-8">
+      <h1 className="text-2xl font-bold text-foreground mb-6">
+        Admin Dashboard
       </h1>
 
-      <Suspense fallback={<SubscriptionSkeleton />}>
-        <ManageSubscription />
-      </Suspense>
+      {/* ---------------- New Jobs ---------------- */}
+      <Card className="w-full shadow-sm">
+        <CardHeader className="flex items-center space-x-2">
+          <ClipboardList className="w-5 h-5 text-muted-foreground" />
+          <CardTitle>Nya, inkomna jobb</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {newJobs.map((job) => (
+            <div
+              key={job.id}
+              className="flex justify-between items-center p-3 border rounded hover:shadow-sm transition"
+            >
+              <div className="flex items-center space-x-3">
+                <Hammer className="w-5 h-5 text-muted-foreground" />
+                <p className="font-medium text-foreground">{job.type}</p>
+              </div>
+              <Badge className={getStatusColor(job.status)}>{job.status}</Badge>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
 
-      <Suspense fallback={<TeamMembersSkeleton />}>
-        <TeamMembers />
-      </Suspense>
+      {/* ---------------- Ongoing Jobs ---------------- */}
+      <Card className="w-full shadow-sm">
+        <CardHeader className="flex items-center space-x-2">
+          <ClipboardList className="w-5 h-5 text-muted-foreground" />
+          <CardTitle>Pågående jobb</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {ongoingJobs.map((job) => (
+            <div
+              key={job.id}
+              className="flex justify-between items-center p-3 border rounded hover:shadow-sm transition"
+            >
+              <div className="flex items-center space-x-3">
+                <Hammer className="w-5 h-5 text-muted-foreground" />
+                <p className="font-medium text-foreground">{job.type}</p>
+              </div>
+              <Badge className={getStatusColor(job.status)}>{job.status}</Badge>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
 
-      <Suspense fallback={<InviteTeamMemberSkeleton />}>
-        <InviteTeamMember />
-      </Suspense>
+      {/* ---------------- Available Workers ---------------- */}
+      <Card className="w-full shadow-sm">
+        <CardHeader className="flex items-center space-x-2">
+          <User className="w-5 h-5 text-muted-foreground" />
+          <CardTitle>Lediga hantverkare</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {availableWorkers.map((worker) => (
+            <div
+              key={worker.id}
+              className="flex justify-between items-center p-3 border rounded hover:shadow-sm transition"
+            >
+              <div>
+                <p className="font-medium text-foreground">{worker.name}</p>
+                <p className="text-sm text-muted-foreground">{worker.trade}</p>
+              </div>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
     </section>
   );
 }
